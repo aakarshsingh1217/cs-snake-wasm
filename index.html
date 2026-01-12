@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>CS Snake (WASM)</title>
+  <style>
+    body { font-family: sans-serif; }
+    canvas { border: 1px solid #ccc; image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+  <h2>CS Snake (WebAssembly)</h2>
+  <div>Points: <span id="pts">0</span></div>
+  <canvas id="c" width="500" height="500"></canvas>
+
+  <script type="module">
+    import createModule from "./snake.js";
+
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+    const ptsEl = document.getElementById("pts");
+
+    const CELL = 50; // 10x10 board => 500px
+    const ROWS = 10, COLS = 10;
+
+    const Module = await createModule();
+
+    const gameInit     = Module.cwrap("game_init", null, []);
+    const handleKey    = Module.cwrap("game_handle_key", null, ["number"]);
+    const getEntity    = Module.cwrap("game_get_entity", "number", ["number","number"]);
+    const headRow      = Module.cwrap("game_get_head_row", "number", []);
+    const headCol      = Module.cwrap("game_get_head_col", "number", []);
+    const isOver       = Module.cwrap("game_is_over", "number", []);
+    const getPoints    = Module.cwrap("game_get_points", "number", []);
+
+    gameInit();
+
+    function colorForEntity(e) {
+      // enum entity order from your code:
+      // BODY_SEGMENT=0, EXIT_LOCKED=1, EXIT_UNLOCKED=2, WALL=3, ...
+      switch (e) {
+        case 0: return "#2ecc71"; // body
+        case 1: return "#e67e22"; // locked exit
+        case 2: return "#f1c40f"; // unlocked exit
+        case 3: return "#7f8c8d"; // wall
+        case 4: return "#e74c3c"; // normal apple
+        case 5: return "#9b59b6"; // reverse apple
+        case 6: return "#3498db"; // split apple
+        case 7: return "#000000"; // exploding apple (simple)
+        case 8: return "#ff00ff"; // explosion
+        case 12: return "#ffffff"; // portal
+        default: return "#ecf0f1"; // empty / passages etc
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      const hr = headRow();
+      const hc = headCol();
+
+      for (let r=0; r<ROWS; r++) {
+        for (let c=0; c<COLS; c++) {
+          const e = getEntity(r,c);
+          ctx.fillStyle = colorForEntity(e);
+          ctx.fillRect(c*CELL, r*CELL, CELL-1, CELL-1);
+        }
+      }
+
+      // draw head on top
+      ctx.fillStyle = "#16a085";
+      ctx.fillRect(hc*CELL, hr*CELL, CELL-1, CELL-1);
+
+      ptsEl.textContent = String(getPoints());
+
+      if (!isOver()) requestAnimationFrame(draw);
+      else {
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#fff";
+        ctx.font = "32px sans-serif";
+        ctx.fillText("Game Over", 170, 250);
+      }
+    }
+
+    draw();
+
+    window.addEventListener("keydown", (ev) => {
+      const keyMap = {
+        "w": "w", "a": "a", "s": "s", "d": "d",
+        "r": "r", "p": "p"
+      };
+      const k = keyMap[ev.key];
+      if (k) {
+        ev.preventDefault();
+        handleKey(k.charCodeAt(0));
+      }
+    });
+  </script>
+</body>
+</html>
