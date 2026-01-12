@@ -6,8 +6,8 @@
   <style>
     body { font-family: sans-serif; }
 
-    /* Layout: board on left, instructions on right */
-    .layout {
+    /* Put board (left) + instructions (right) on the same row */
+    .row {
       display: flex;
       align-items: flex-start;
       gap: 24px;
@@ -15,23 +15,27 @@
 
     canvas { border: 1px solid #ccc; image-rendering: pixelated; }
 
-    .sidebar {
-      max-width: 360px;
-      line-height: 1.35;
+    .panel {
+      width: 320px;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
     }
 
-    .sidebar h3 {
-      margin: 0 0 8px 0;
+    .panel h3 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
     }
 
-    .sidebar ul {
+    .panel ul {
       margin: 8px 0 0 18px;
       padding: 0;
+      line-height: 1.4;
     }
 
     .kbd {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
-                   monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       padding: 1px 6px;
       border: 1px solid #bbb;
       border-bottom-width: 2px;
@@ -41,27 +45,29 @@
       margin: 0 2px;
     }
 
-    .pill {
+    .tag {
       display: inline-block;
+      font-size: 12px;
       padding: 2px 8px;
       border-radius: 999px;
-      font-size: 12px;
+      color: #fff;
       vertical-align: middle;
       margin-right: 6px;
-      border: 1px solid #ddd;
     }
   </style>
 </head>
 <body>
   <h2>CS Snake (WebAssembly)</h2>
 
-  <div class="layout">
-    <div class="left">
+  <div class="row">
+    <!-- LEFT: score + board -->
+    <div>
       <div>Points: <span id="pts">0</span></div>
       <canvas id="c" width="500" height="500"></canvas>
     </div>
 
-    <aside class="sidebar">
+    <!-- RIGHT: instructions panel -->
+    <div class="panel">
       <h3>How to play</h3>
       <ul>
         <li>
@@ -69,30 +75,24 @@
           <span class="kbd">W</span><span class="kbd">A</span><span class="kbd">S</span><span class="kbd">D</span>
         </li>
         <li>
-          Don’t hit your snake body or the locked exit at <b>(1, 8)</b>.
+          Don’t crash into your <b>snake body</b>.
+        </li>
+        <li>
+          Don’t move onto the <b>locked exit</b> at <b>(1, 8)</b>.
         </li>
         <li>
           Default map items:
           <ul>
-            <li>
-              <span class="pill" style="background:#e74c3c;color:#fff;">Normal</span>
-              Apple at <b>(2, 2)</b> = <b>+5</b> points
-            </li>
-            <li>
-              <span class="pill" style="background:#9b59b6;color:#fff;">Reverse</span>
-              Apple at <b>(3, 6)</b> = <b>+10</b> points
-            </li>
-            <li>
-              <span class="pill" style="background:#3498db;color:#fff;">Split</span>
-              Apple at <b>(6, 3)</b> = <b>+20</b> points
-            </li>
+            <li><span class="tag" style="background:#e74c3c;">Normal</span>Apple at <b>(2, 2)</b> = <b>+5</b> points</li>
+            <li><span class="tag" style="background:#9b59b6;">Reverse</span>Apple at <b>(3, 6)</b> = <b>+10</b> points</li>
+            <li><span class="tag" style="background:#3498db;">Split</span>Apple at <b>(6, 3)</b> = <b>+20</b> points</li>
           </ul>
         </li>
         <li>
-          To play again, simply <b>reload the page</b>.
+          To play again, <b>reload the page</b>.
         </li>
       </ul>
-    </aside>
+    </div>
   </div>
 
   <script type="module">
