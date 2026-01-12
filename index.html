@@ -5,13 +5,95 @@
   <title>CS Snake (WASM)</title>
   <style>
     body { font-family: sans-serif; }
+
+    /* Layout: board on left, instructions on right */
+    .layout {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
     canvas { border: 1px solid #ccc; image-rendering: pixelated; }
+
+    .sidebar {
+      max-width: 360px;
+      line-height: 1.35;
+    }
+
+    .sidebar h3 {
+      margin: 0 0 8px 0;
+    }
+
+    .sidebar ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+    }
+
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+                   monospace;
+      padding: 1px 6px;
+      border: 1px solid #bbb;
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      background: #f6f6f6;
+      display: inline-block;
+      margin: 0 2px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid #ddd;
+    }
   </style>
 </head>
 <body>
   <h2>CS Snake (WebAssembly)</h2>
-  <div>Points: <span id="pts">0</span></div>
-  <canvas id="c" width="500" height="500"></canvas>
+
+  <div class="layout">
+    <div class="left">
+      <div>Points: <span id="pts">0</span></div>
+      <canvas id="c" width="500" height="500"></canvas>
+    </div>
+
+    <aside class="sidebar">
+      <h3>How to play</h3>
+      <ul>
+        <li>
+          Move with
+          <span class="kbd">W</span><span class="kbd">A</span><span class="kbd">S</span><span class="kbd">D</span>
+        </li>
+        <li>
+          Don’t hit your snake body or the locked exit at <b>(1, 8)</b>.
+        </li>
+        <li>
+          Default map items:
+          <ul>
+            <li>
+              <span class="pill" style="background:#e74c3c;color:#fff;">Normal</span>
+              Apple at <b>(2, 2)</b> = <b>+5</b> points
+            </li>
+            <li>
+              <span class="pill" style="background:#9b59b6;color:#fff;">Reverse</span>
+              Apple at <b>(3, 6)</b> = <b>+10</b> points
+            </li>
+            <li>
+              <span class="pill" style="background:#3498db;color:#fff;">Split</span>
+              Apple at <b>(6, 3)</b> = <b>+20</b> points
+            </li>
+          </ul>
+        </li>
+        <li>
+          To play again, simply <b>reload the page</b>.
+        </li>
+      </ul>
+    </aside>
+  </div>
 
   <script type="module">
     import createModule from "./snake.js";
